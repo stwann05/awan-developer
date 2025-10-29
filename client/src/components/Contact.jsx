@@ -26,7 +26,7 @@ export default function Contact() {
     setAlert({ type: "", message: "" });
 
     try {
-      const res = await fetch("http://localhost:5000/contact", {
+      const res = await fetch("https://awan-developer.vercel.app/api/contact.js", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
