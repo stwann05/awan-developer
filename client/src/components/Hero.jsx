@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 export default function Hero() {
   return (
     <section
@@ -11,28 +9,14 @@ export default function Hero() {
         {/* Layer 1 — soft cyan blur */}
         <div className="absolute top-[-10rem] left-[10%] w-[30rem] h-[30rem] bg-cyan-500/30 rounded-full blur-[120px]" />
 
-        {/* Layer 2 — subtle animated glow */}
+        {/* Layer 2 — static gradient glow */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            className="w-[25rem] h-[25rem] bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-[60%] blur-3xl"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          <div className="w-[25rem] h-[25rem] bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-[60%] blur-3xl" />
         </div>
       </div>
 
-      {/* Animated content */}
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0, y: 50 }}          // mulai transparan dan agak turun
-        whileInView={{ opacity: 1, y: 0 }}       // muncul dan naik perlahan
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        viewport={{ once: true }}                // animasi hanya muncul sekali
-      >
+      {/* Static content */}
+      <div className="text-center">
         <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-7xl">
           Hello, I’m Ivan Setiawan
         </h1>
@@ -54,7 +38,7 @@ export default function Hero() {
             Contact Me →
           </a>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
