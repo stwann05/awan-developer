@@ -1,9 +1,8 @@
 import nodemailer from "nodemailer";
 import mongoose from "mongoose";
 
-// ====== KONEKSI MONGODB ======
+// ====== KONEKSI MONGODB (hindari koneksi ganda) ======
 const MONGO_URI = process.env.MONGO_URI;
-
 if (!global._mongoose) {
   global._mongoose = mongoose.connect(MONGO_URI);
 }
@@ -18,42 +17,47 @@ const contactSchema = new mongoose.Schema({
   message: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
+const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSchema);
 
-const Contact =
-  mongoose.models.Contact || mongoose.model("Contact", contactSchema);
-
-// ====== HANDLER ======
+// ====== HANDLER API ======
 export default async function handler(req, res) {
-  // ✅ Izinkan request dari frontend kamu
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://awan-developer-3zh3.vercel.app"
-  );
+  // ====== CORS SETUP ======
+  const allowedOrigins = [
+    "https://awan-developer-3zh3.vercel.app", // frontend lama (Vercel)
+    "https://awandevloper.my.id",                    // domain baru (Hostinger)
+    "https://www.awandevloper.my.id",                // versi www (opsional)
+  ];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // ✅ Tangani preflight request (OPTIONS)
+  // ====== HANDLE PREFLIGHT ======
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // ====== BATAS: hanya POST diizinkan ======
+  // ====== BATAS: hanya POST ======
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  // ====== AMBIL DATA DARI BODY ======
-  const { firstName, lastName, company, email, phoneNumber, message } =
-    req.body;
-
-  if (!firstName || !lastName || !email || !message) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing required fields" });
-  }
-
   try {
-    // ====== SIMPAN KE MONGODB ======
+    const { firstName, lastName, company, email, phoneNumber, message } = req.body;
+
+    // Validasi data
+    if (!firstName || !lastName || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    // ====== SIMPAN KE DATABASE ======
     const newContact = new Contact({
       firstName,
       lastName,
@@ -64,7 +68,7 @@ export default async function handler(req, res) {
     });
     await newContact.save();
 
-    // ====== KIRIM EMAIL VIA GMAIL SMTP ======
+    // ====== KIRIM EMAIL ======
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -88,13 +92,12 @@ Message: ${message}
 
     await transporter.sendMail(mailOptions);
 
-    // ====== KIRIM RESPON BERHASIL ======
-    res
+    return res
       .status(200)
       .json({ success: true, message: "✅ Email sent and saved successfully!" });
   } catch (err) {
     console.error("❌ Error:", err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Error sending or saving contact",
       error: err.message,
