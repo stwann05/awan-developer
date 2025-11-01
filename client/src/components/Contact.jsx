@@ -1,6 +1,5 @@
 'use client'
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function Contact() {
@@ -12,9 +11,13 @@ export default function Contact() {
     phone: "",
     message: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ type: "", message: "" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,7 +29,7 @@ export default function Contact() {
     setAlert({ type: "", message: "" });
 
     try {
-      const res = await fetch("https://awan-developer.vercel.app/api/contact.js", {
+      const res = await fetch("https://awandevloper.my.id/api/contact.js", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -46,7 +49,7 @@ export default function Contact() {
       } else {
         setAlert({ type: "error", message: data.error || "Failed to send message." });
       }
-    } catch (err) {
+    } catch {
       setAlert({ type: "error", message: "Server not reachable." });
     } finally {
       setLoading(false);
@@ -58,25 +61,19 @@ export default function Contact() {
       id="contact"
       className="relative isolate bg-gray-900 text-white px-6 py-24 sm:py-32 lg:px-8 overflow-hidden"
     >
-      {/* ✨ Background transition — menyambung dari Projects */}
+      {/* ✨ Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Glow atas (nyambung dari bawah Projects) */}
-        <div className="absolute top-[-6rem] left-1/2 -translate-x-1/2 w-[50rem] h-[25rem] bg-gradient-to-b from-cyan-400/10 via-transparent to-transparent blur-[100px]" />
-
-        {/* Gradient dasar */}
+        <div className="absolute top-[-6rem] left-1/2 -translate-x-1/2 w-[30rem] sm:w-[50rem] h-[15rem] sm:h-[25rem] bg-gradient-to-b from-cyan-400/10 via-transparent to-transparent blur-[60px] sm:blur-[100px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/95 to-gray-950" />
+        <div className="absolute bottom-[10%] left-[15%] w-[15rem] sm:w-[25rem] h-[15rem] sm:h-[25rem] bg-cyan-500/15 rounded-full blur-[60px] sm:blur-[120px]" />
 
-        {/* Efek samping lembut */}
-        <div className="absolute bottom-[10%] left-[15%] w-[25rem] h-[25rem] bg-cyan-500/15 rounded-full blur-[120px]" />
-        <motion.div
-          className="absolute bottom-[-8rem] right-[10%] w-[28rem] h-[28rem] bg-gradient-to-br from-blue-500/20 to-cyan-400/20 rounded-[50%] blur-[140px]"
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+        {!isMobile && (
+          <motion.div
+            className="absolute bottom-[-8rem] right-[10%] w-[18rem] sm:w-[28rem] h-[18rem] sm:h-[28rem] bg-gradient-to-br from-blue-500/20 to-cyan-400/20 rounded-[50%] blur-[80px] sm:blur-[140px]"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+        )}
       </div>
 
       {/* 🧭 Header */}
@@ -98,7 +95,7 @@ export default function Contact() {
       {/* 📝 FORM */}
       <motion.form
         onSubmit={handleSubmit}
-        className="mx-auto mt-16 max-w-xl sm:mt-20 bg-gray-800/70 backdrop-blur-md p-8 rounded-2xl border border-cyan-500/10 shadow-lg relative z-10"
+        className="mx-auto mt-16 max-w-xl sm:mt-20 bg-gray-800/90 sm:backdrop-blur-md p-8 rounded-2xl border border-cyan-500/10 shadow-lg relative z-10"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -111,25 +108,22 @@ export default function Contact() {
             { id: "company", label: "Company" },
             { id: "email", label: "Email", type: "email", required: true },
             { id: "phone", label: "Phone number", placeholder: "123-456-7890" },
-          ].map((field) => (
-            <div key={field.id} className={field.id === "company" || field.id === "email" || field.id === "phone" ? "sm:col-span-2" : ""}>
-              <label htmlFor={field.id} className="block text-sm font-semibold text-white">
-                {field.label}
-              </label>
+          ].map((f) => (
+            <div key={f.id} className={f.id === "company" || f.id === "email" || f.id === "phone" ? "sm:col-span-2" : ""}>
+              <label htmlFor={f.id} className="block text-sm font-semibold text-white">{f.label}</label>
               <input
-                id={field.id}
-                name={field.id}
-                type={field.type || "text"}
-                required={field.required}
-                placeholder={field.placeholder}
-                value={formData[field.id]}
+                id={f.id}
+                name={f.id}
+                type={f.type || "text"}
+                required={f.required}
+                placeholder={f.placeholder}
+                value={formData[f.id]}
                 onChange={handleChange}
                 className="mt-2.5 block w-full rounded-md bg-gray-900/40 border border-cyan-500/20 px-3.5 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
           ))}
 
-          {/* Message */}
           <div className="sm:col-span-2">
             <label htmlFor="message" className="block text-sm font-semibold text-white">
               Message
@@ -146,14 +140,13 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="mt-10">
           <motion.button
             type="submit"
             disabled={loading}
-            whileHover={{ scale: 1.02 }}
+            whileHover={!isMobile ? { scale: 1.02 } : {}}
             whileTap={{ scale: 0.98 }}
-            className={`w-full rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 px-3.5 py-2.5 text-center text-sm font-semibold text-gray-900 shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all ${
+            className={`w-full rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 px-3.5 py-2.5 text-center text-sm font-semibold text-gray-900 shadow-md transition-all ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -161,7 +154,6 @@ export default function Contact() {
           </motion.button>
         </div>
 
-        {/* Alert */}
         {alert.message && (
           <p
             className={`mt-4 text-center ${
@@ -173,14 +165,15 @@ export default function Contact() {
         )}
       </motion.form>
 
-      {/* 🔆 Cahaya bawah biar smooth ke footer */}
-      <motion.div
-        className="absolute bottom-[-4rem] left-1/2 -translate-x-1/2 w-[60%] h-[6rem] bg-gradient-to-t from-cyan-400/10 via-transparent to-transparent blur-3xl rounded-full"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 2, ease: "easeInOut" }}
-        viewport={{ once: true }}
-      />
+      {!isMobile && (
+        <motion.div
+          className="absolute bottom-[-4rem] left-1/2 -translate-x-1/2 w-[60%] h-[6rem] bg-gradient-to-t from-cyan-400/10 via-transparent to-transparent blur-xl sm:blur-3xl rounded-full"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 2, ease: "easeInOut" }}
+          viewport={{ once: true }}
+        />
+      )}
     </section>
   );
 }

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 
 export default function Projects() {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
   const projects = [
     {
       title: "Portfolio Website",
@@ -32,12 +34,9 @@ export default function Projects() {
     >
       {/* 🌌 Background Layers */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Top glow */}
-        <div className="absolute top-[-10rem] right-[20%] w-[35rem] h-[35rem] bg-cyan-500/20 rounded-full blur-[120px]" />
-        {/* Mid soft gradient */}
+        <div className="absolute top-[-8rem] right-[20%] w-[20rem] h-[20rem] sm:w-[35rem] sm:h-[35rem] bg-cyan-500/20 rounded-full blur-[60px] sm:blur-[120px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/80 to-gray-950" />
-        {/* Bottom glow */}
-        <div className="absolute bottom-[-10rem] left-[15%] w-[30rem] h-[30rem] bg-blue-500/25 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[-8rem] left-[15%] w-[18rem] h-[18rem] sm:w-[30rem] sm:h-[30rem] bg-blue-500/25 rounded-full blur-[80px] sm:blur-[140px]" />
       </div>
 
       {/* 🧠 Content */}
@@ -47,21 +46,20 @@ export default function Projects() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.3 }}
         >
           My Projects
         </motion.h2>
 
-        {/* 🧩 Project Cards */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, index) => (
             <motion.div
               key={index}
-              className="relative bg-gray-800/70 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-cyan-500/10 hover:border-cyan-400/40 hover:bg-gray-800/90 transition-all duration-300 flex flex-col justify-between"
-              initial={{ opacity: 0, y: 40 }}
+              className="relative bg-gray-800/80 sm:backdrop-blur-md rounded-2xl p-6 shadow-lg border border-cyan-500/10 hover:border-cyan-400/40 hover:bg-gray-800/90 transition-all duration-300 flex flex-col justify-between"
+              initial={{ opacity: 0, y: isMobile ? 0 : 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.3 }}
             >
               <div className="flex-grow">
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-white">
@@ -83,11 +81,11 @@ export default function Projects() {
                 </div>
               </div>
 
-              <div className="z-20 mt-auto flex justify-center">
+              <div className="mt-auto flex justify-center">
                 <motion.button
                   onClick={() => window.open(project.link, "_blank")}
                   className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-gray-900 font-semibold px-5 py-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                  whileHover={{ y: -2 }}
+                  whileHover={!isMobile ? { y: -2 } : {}}
                   whileTap={{ scale: 0.97 }}
                 >
                   View Project →
@@ -98,13 +96,15 @@ export default function Projects() {
         </div>
 
         {/* ✨ Bottom Accent Glow */}
-        <motion.div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[50%] h-[5rem] bg-gradient-to-t from-cyan-400/10 via-transparent to-transparent blur-3xl rounded-full"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
-          viewport={{ once: true }}
-        />
+        {!isMobile && (
+          <motion.div
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[50%] h-[5rem] bg-gradient-to-t from-cyan-400/10 via-transparent to-transparent blur-xl sm:blur-3xl rounded-full"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            viewport={{ once: true }}
+          />
+        )}
       </div>
     </section>
   );
